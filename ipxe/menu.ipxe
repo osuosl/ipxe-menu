@@ -9,7 +9,6 @@ set cls ${cls:string}
 
 isset ${arch} && goto skip_arch_detect ||
 cpuid --ext 29 && set arch x86_64 || set arch i386
-iseq ${buildarch} arm64 && set arch arm64 ||
 :skip_arch_detect
 isset ${menu} && goto ${menu} ||
 
@@ -22,35 +21,17 @@ set space ${space:string}
 iseq ${arch} x86_64 && set arch_a amd64 || set arch_a ${arch}
 menu ${site_name}
 item --gap Default:
+item razor ${space} Boot from Razor with tftp://${razor_server}/${razor_file}
 item local ${space} Boot from local hdd
-item --gap Distributions:
-iseq ${menu_linux} 1 && item linux ${space} Linux Installs ||
-iseq ${menu_bsd} 1 && item bsd ${space} BSD Installs ||
-iseq ${menu_freedos} 1 && item freedos ${space} FreeDOS || 
-iseq ${menu_hypervisor} 1 && item hypervisor ${space} Hypervisor Installs ||
-iseq ${menu_live} 1 && item live ${space} Live Boot ||
-iseq ${menu_security} 1 && item security ${space} Security Related ||
-iseq ${menu_windows} 1 && item windows ${space} Windows ||
 item --gap Tools:
-iseq ${menu_utils} 1 && item utils ${space} Utilities ||
-iseq ${arch} x86_64 && set bits 64 || set bits 32
-item changebits ${space} Architecture: ${arch} (${bits}bit)
 item shell ${space} iPXE shell
 item netinfo ${space} Network card info
-item --gap Signature Checks:
-item sig_check ${space} netboot.xyz [ enabled: ${sigs_enabled} ]
-item img_sigs_check ${space} Images [ enabled: ${img_sigs_enabled} ]
-isset ${github_user} && item --gap Custom Menu: ||
-isset ${github_user} && item nbxyz-custom ${space} ${github_user}'s Custom Menu ||
-isset ${menu} && set timeout 0 || set timeout 300000
-choose --timeout ${timeout} --default ${menu} menu || goto local
+item netboot_xyz ${space} Boot from netboot.xyz
+item reboot ${space} Reboot machine
+isset ${menu} && set timeout 0 || set timeout 5000
+choose --timeout ${timeout} --default ${menu} menu || goto razor
 echo ${cls}
 goto ${menu} ||
-iseq ${sigs_enabled} true && goto verify_sigs || goto change_menu
-
-:verify_sigs
-imgverify ${menu}.ipxe ${sigs}${menu}.ipxe.sig || goto error
-goto change_menu
 
 :change_menu
 chain ${menu}.ipxe || goto error
@@ -60,6 +41,14 @@ goto main_menu
 echo Error occured, press any key to return to menu ...
 prompt
 goto main_menu
+
+:razor
+echo Booting from Razor via ${primary_network} with tftp://${razor_server}/${razor_file}
+chain tftp://${razor_server}/${razor_file} || echo Error loading Razor, trying local drive && goto local
+
+:netboot_xyz
+echo Booting from boot.netboot.xyz
+chain --autofree https://boot.netboot.xyz || goto main_menu
 
 :local
 echo Booting from local disks ...
@@ -71,18 +60,6 @@ set menu main_menu
 shell
 goto main_menu
 
-:changebits
-iseq ${arch} x86_64 && set arch i386 || set arch x86_64
-goto main_menu
-
-:sig_check
-iseq ${sigs_enabled} true && set sigs_enabled false || set sigs_enabled true
-goto main_menu
-
-:img_sigs_check
-iseq ${img_sigs_enabled} true && set img_sigs_enabled false || set img_sigs_enabled true
-goto main_menu
-
-:nbxyz-custom
-chain https://raw.githubusercontent.com/${github_user}/netboot.xyz-custom/master/custom.ipxe || goto error
-goto main_menu
+:reboot
+echo Rebooting machine
+reboot
