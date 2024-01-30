@@ -1,0 +1,50 @@
+#!ipxe
+goto ${menu} ||
+
+:debian
+set os Debian
+set os_arch ${arch}
+iseq ${os_arch} x86_64 && set os_arch amd64 ||
+iseq ${os_arch} i386 && set os_arch i386 ||
+iseq ${os_arch} arm64 && set os_arch arm64 ||
+menu ${os} - ${os_arch}
+item bookworm ${space} ${os} 12.0 (bookworm)
+choose debian_version || goto debian_exit
+goto mirrorcfg
+
+:mirrorcfg
+set debian_mirror ${debian_mirror}
+set mirrorcfg mirror/suite=${debian_version}
+set dir ${debian_base_dir}/dists/${debian_version}/main/installer-${os_arch}/current/images/netboot/${menu}-installer/${os_arch}
+set preseedurl http://${boot_domain}/netboot/preseed/debian.cfg
+set locales debian-installer=en_US locale=en_US kbd-chooser/method=us console-setup/ask_detect=false
+set install_params install auto=true priority=critical ${locales} preseed/url=${preseedurl}
+goto boottype
+
+:boottype
+set ova ${os} ${debian_version}
+menu ${os} ${os_arch} boot type
+item install ${ova} install
+item
+item --gap Settings:
+item
+item --gap preseed: ${preseedurl}
+item --gap repo: ${debian_mirror}
+item --gap cmdline: ${cmdline}
+isset ${bt} || choose bt || goto debian
+iseq ${bt} install && goto deb_boot ||
+iseq ${bt} megaraid_menu && goto megaraid_menu ||
+goto deb_boot
+
+:deb_boot
+imgfree
+kernel ${debian_mirror}/${dir}/linux ${install_params} interface=auto ${mirrorcfg} initrd=initrd.gz ${cmdline}
+initrd ${debian_mirror}/${dir}/initrd.gz
+echo
+echo MD5sums:
+md5sum linux initrd.gz
+boot
+
+:debian_exit
+clear menu
+exit 0
