@@ -1,0 +1,29 @@
+#!ipxe
+set ipparam BOOTIF=${netX/mac} ip=dhcp
+set dir netboot/firmware/centos-7
+
+goto ${menu} ||
+
+:firmware
+menu Firmware OS Images
+item firmware Firmware
+item
+item --gap Settings:
+item
+item --gap cmdline: ${cmdline}
+goto ${menu} ||
+echo ${cls}
+
+:firmware
+imgfree
+kernel http://${boot_domain}/${dir}/vmlinuz initrd=initrd.img root=live:http://${boot_domain}/${dir}/squashfs.img rw selinux=0 rd.writable.fsimg=1 ${ipparam} ${cmdline}
+initrd http://${boot_domain}/${dir}/initrd.img
+
+echo MD5sums:
+md5sum vmlinuz initrd.img
+boot
+goto firmware_exit
+
+:firmware_exit
+clear menu
+exit 0
