@@ -21,7 +21,7 @@ set dir ${debian_base_dir}/dists/${debian_version}/main/installer-${os_arch}/cur
 set preseedurl http://${boot_domain}/netboot/preseed/debian.cfg
 set locales debian-installer=en_US locale=en_US kbd-chooser/method=us console-setup/ask_detect=false
 set install_params install auto=true priority=critical ${locales} preseed/url=${preseedurl}
-iseq ${firmware_enabled} false && set initrd_url ${debian_mirror}/${dir}/initrd.gz
+iseq ${firmware_enabled} false && set initrd_url ${debian_mirror}/${dir}/initrd.gz ||
 goto boottype
 
 :boottype
