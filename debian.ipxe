@@ -43,7 +43,7 @@ iseq ${bt} firmware_menu && goto firmware_menu ||
 goto deb_boot
 
 :firmware_menu
-set initrd_url http://${boot_domain}/http/debian/${debian_version/initrd.gz
+set initrd_url http://${boot_domain}/http/debian/${debian_version}/initrd.gz
 set firmware_enabled true
 clear bt
 goto debian
