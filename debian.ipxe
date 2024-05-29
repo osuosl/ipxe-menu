@@ -28,7 +28,7 @@ set ova ${os} ${debian_version}
 menu ${os} ${os_arch} boot type
 item install ${ova} install
 item
-item firmware_menu Use Non-free Firmware [ ${firmware_enabled ]
+item firmware_menu Use Non-free Firmware [ ${firmware_enabled} ]
 item
 item --gap Settings:
 item
