@@ -39,8 +39,8 @@ iseq ${bt} megaraid_menu && goto megaraid_menu ||
 goto bootos_images
 
 :megaraid_menu
-iseq ${osversion} 8 && set megaraid inst.dd=${elrepo_mirror}/dud/el8/x86_64/dd-megaraid_sas-07.725.01.00-1.el8_9.elrepo.iso ||
-iseq ${osversion} 9 && set megaraid inst.dd=${elrepo_mirror}/dud/el9/x86_64/dd-megaraid_sas-07.725.01.00-1.el9_3.elrepo.iso ||
+iseq ${osversion} 8 && set megaraid inst.dd=${elrepo_mirror}/dud/el8/x86_64/dd-megaraid_sas-07.727.03.00-1.el8_10.elrepo.iso ||
+iseq ${osversion} 9 && set megaraid inst.dd=${elrepo_mirror}/dud/el9/x86_64/dd-megaraid_sas-07.727.03.00-1.el9_4.elrepo.iso ||
 set megaraid_enabled true
 clear bt
 goto almalinux
