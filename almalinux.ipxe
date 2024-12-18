@@ -1,6 +1,5 @@
 #!ipxe
 set ipparam BOOTIF=${netX/mac} ip=dhcp ksdevice=bootif
-set megaraid_enabled false
 
 goto ${menu} ||
 
@@ -26,8 +25,6 @@ set ova ${os} ${osversion}
 menu ${os} ${os_arch} boot type
 item install ${ova} install
 item
-item megaraid_menu Use MegaRAID DUD [ ${megaraid_enabled} ]
-item
 item --gap Settings:
 item
 item --gap ks: ${kickstart}
@@ -35,19 +32,11 @@ item --gap repo: ${repo}
 item --gap cmdline: ${cmdline}
 isset ${bt} || choose bt || goto almalinux
 iseq ${bt} install && goto bootos_images ||
-iseq ${bt} megaraid_menu && goto megaraid_menu ||
 goto bootos_images
-
-:megaraid_menu
-iseq ${osversion} 8 && set megaraid inst.dd=${elrepo_mirror}/dud/el8/x86_64/dd-megaraid_sas-07.727.03.00-1.el8_10.elrepo.iso ||
-iseq ${osversion} 9 && set megaraid inst.dd=${elrepo_mirror}/dud/el9/x86_64/dd-megaraid_sas-07.727.03.00-1.el9_4.elrepo.iso ||
-set megaraid_enabled true
-clear bt
-goto almalinux
 
 :bootos_images
 imgfree
-kernel ${repo}/images/pxeboot/vmlinuz network inst.repo=${repo}/ inst.text inst.gpt ${megaraid} inst.ks=${kickstart} ${ipparam} initrd=initrd.img ${cmdline}
+kernel ${repo}/images/pxeboot/vmlinuz network inst.repo=${repo}/ inst.text inst.gpt inst.ks=${kickstart} ${ipparam} initrd=initrd.img ${cmdline}
 initrd ${repo}/images/pxeboot/initrd.img
 echo MD5sums:
 md5sum vmlinuz initrd.img
