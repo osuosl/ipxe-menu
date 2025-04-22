@@ -45,6 +45,7 @@ item --gap Tools:
 item cmdline ${space} Kernel cmdline params: [${cmdline}]
 item shell ${space} iPXE shell
 item netinfo ${space} Network card info
+item live ${space} Live Image
 item firmware ${space} Firmware Image
 item netboot_xyz ${space} Boot from netboot.xyz
 item reboot ${space} Reboot machine

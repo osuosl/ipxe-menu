@@ -1,0 +1,31 @@
+#!ipxe
+set ipparam BOOTIF=${netX/mac} ip=dhcp
+set dir netboot/live/almalinux
+
+goto ${menu} ||
+
+:live
+menu Live Images
+item live AlmaLinux Live
+item
+item --gap Settings:
+item
+item --gap cmdline: ${cmdline}
+isset ${l} || choose l || goto live
+isseq ${l} live && goto live_boot ||
+goto live_boot
+echo ${cls}
+
+:live_boot
+imgfree
+kernel http://${boot_domain}/${dir}/vmlinuz initrd=initramfs root=live:http://${boot_domain}/${dir}/live-rootfs.squashfs.img rw selinux=0 rd.writable.fsimg=1 ${ipparam} ${cmdline}
+initrd http://${boot_domain}/${dir}/initramfs
+
+echo MD5sums:
+md5sum vmlinuz initramfs
+boot
+goto live_exit
+
+:live_exit
+clear menu
+exit 0
