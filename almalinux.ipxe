@@ -10,6 +10,7 @@ set os_arch ${arch}
 iseq ${os_arch} x86_64 && set os_arch x86_64 ||
 iseq ${os_arch} arm64 && set os_arch aarch64 ||
 menu ${os} - ${os_arch}
+item 10 ${space} ${os} 10 (Latest)
 item 9 ${space} ${os} 9 (Latest)
 item 8 ${space} ${os} 8 (Latest)
 isset ${osversion} || choose osversion || goto almalinux_exit
@@ -18,6 +19,7 @@ echo ${cls}
 set kickstart http://${boot_domain}/netboot/kickstart/almalinux-${osversion}-${os_arch}.cfg
 set dir ${osversion}/BaseOS/${os_arch}/os
 set repo ${almalinux_mirror}/${dir}
+iseq ${osversion} 10 && set alma10params "inst.rdp inst.rdp.username=osuadmin inst.rdp.password=osuadmin ip=dhcp" || set alma10params
 goto boottype
 
 :boottype
@@ -36,7 +38,7 @@ goto bootos_images
 
 :bootos_images
 imgfree
-kernel ${repo}/images/pxeboot/vmlinuz network inst.repo=${repo}/ inst.text inst.gpt inst.ks=${kickstart} ${ipparam} initrd=initrd.img ${cmdline}
+kernel ${repo}/images/pxeboot/vmlinuz network inst.repo=${repo}/ inst.text inst.gpt inst.ks=${kickstart} ${ipparam} ${alma10params} initrd=initrd.img ${cmdline}
 initrd ${repo}/images/pxeboot/initrd.img
 echo MD5sums:
 md5sum vmlinuz initrd.img
