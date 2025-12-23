@@ -10,7 +10,7 @@ set os_arch ${arch}
 iseq ${os_arch} x86_64 && set os_arch x86_64 ||
 iseq ${os_arch} arm64 && set os_arch aarch64 ||
 menu ${os} - ${os_arch}
-item 10 ${space} ${os} 10 (Latest)
+item 10.0 ${space} ${os} 10.0 (Latest)
 item 9 ${space} ${os} 9 (Latest)
 item 8 ${space} ${os} 8 (Latest)
 isset ${osversion} || choose osversion || goto almalinux_exit
@@ -19,7 +19,8 @@ echo ${cls}
 set kickstart http://${boot_domain}/netboot/kickstart/almalinux-${osversion}-${os_arch}.cfg
 set dir ${osversion}/BaseOS/${os_arch}/os
 set repo ${almalinux_mirror}/${dir}
-iseq ${osversion} 10 && set alma10params inst.rdp inst.rdp.username=osuadmin inst.rdp.password=osuadmin ip=dhcp || set alma10params
+iseq ${osversion} 10.0 && set repo http://vault.almalinux.org/${dir} || true
+iseq ${osversion} 10.0 && set alma10params inst.rdp inst.rdp.username=osuadmin inst.rdp.password=osuadmin || set alma10params
 goto boottype
 
 :boottype
