@@ -1,0 +1,45 @@
+#!ipxe
+
+goto ${menu} ||
+
+:ubuntu
+set os Ubuntu
+set os_arch ${arch}
+iseq ${os_arch} x86_64 && set os_arch amd64 ||
+iseq ${os_arch} i386 && set os_arch i386 ||
+iseq ${os_arch} arm64 && set os_arch arm64 ||
+menu ${os} - ${os_arch}
+item noble ${space} ${os} 24.04 LTS (noble)
+choose ubuntu_version || goto ubuntu_exit
+goto mirrorcfg
+
+:mirrorcfg
+set dir netboot/ubuntu/${ubuntu_version}/${os_arch}
+set autoinstall_url http://${boot_domain}/netboot/autoinstall/ubuntu/
+goto boottype
+
+:boottype
+set ova ${os} ${ubuntu_version}
+menu ${os} ${os_arch} boot type
+item install ${ova} install
+item
+item --gap Settings:
+item
+item --gap autoinstall: ${autoinstall_url}
+item --gap cmdline: ${cmdline}
+isset ${bt} || choose bt || goto ubuntu
+iseq ${bt} install && goto ubu_boot ||
+goto ubu_boot
+
+:ubu_boot
+imgfree
+kernel http://${boot_domain}/${dir}/vmlinuz initrd=initrd autoinstall ds=nocloud-net;s=${autoinstall_url} ip=dhcp ${cmdline}
+initrd http://${boot_domain}/${dir}/initrd
+echo
+echo MD5sums:
+md5sum vmlinuz initrd
+boot
+
+:ubuntu_exit
+clear menu
+exit 0

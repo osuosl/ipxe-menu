@@ -41,6 +41,7 @@ item local ${space} Boot from local hdd
 item --gap Distributions:
 item almalinux ${space} Install AlmaLinux
 item debian ${space} Install Debian
+item ubuntu ${space} Install Ubuntu
 item --gap Tools:
 item cmdline ${space} Kernel cmdline params: [${cmdline}]
 item shell ${space} iPXE shell
