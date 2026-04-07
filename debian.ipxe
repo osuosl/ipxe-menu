@@ -49,7 +49,7 @@ goto deb_boot
 set initrd_url http://${boot_domain}/netboot/debian/${debian_version}/initrd.gz
 set firmware_enabled true
 clear bt
-goto debian
+goto boottype
 
 :deb_rescue
 set preseedurl http://${boot_domain}/netboot/preseed/debian-rescue.cfg
