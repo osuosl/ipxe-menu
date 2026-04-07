@@ -29,6 +29,7 @@ goto boottype
 set ova ${os} ${osversion}
 menu ${os} ${os_arch} boot type
 item install ${ova} install
+item rescue ${ova} rescue
 item
 item --gap Settings:
 item
@@ -37,11 +38,17 @@ item --gap repo: ${repo}
 item --gap cmdline: ${cmdline}
 isset ${bt} || choose bt || goto almalinux
 iseq ${bt} install && goto bootos_images ||
+iseq ${bt} rescue && goto alma_rescue ||
+goto bootos_images
+
+:alma_rescue
+set kickstart http://${boot_domain}/netboot/kickstart/almalinux-rescue.cfg
+set rescue_params inst.rescue
 goto bootos_images
 
 :bootos_images
 imgfree
-kernel ${repo}/images/pxeboot/vmlinuz network inst.repo=${repo}/ inst.text inst.gpt inst.ks=${kickstart} ${ipparam} ${alma10params} initrd=initrd.img ${cmdline}
+kernel ${repo}/images/pxeboot/vmlinuz network inst.repo=${repo}/ inst.text inst.gpt inst.ks=${kickstart} ${rescue_params} ${ipparam} ${alma10params} initrd=initrd.img ${cmdline}
 initrd ${repo}/images/pxeboot/initrd.img
 echo MD5sums:
 md5sum vmlinuz initrd.img
