@@ -53,7 +53,7 @@ goto boottype
 
 :deb_rescue
 set preseedurl http://${boot_domain}/netboot/preseed/debian-rescue.cfg
-set install_params rescue auto=true priority=critical ${locales} preseed/url=${preseedurl}
+set install_params rescue/enable=true auto=true priority=critical ${locales} preseed/url=${preseedurl}
 goto deb_boot
 
 :deb_boot
