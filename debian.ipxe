@@ -29,6 +29,7 @@ goto boottype
 set ova ${os} ${debian_version}
 menu ${os} ${os_arch} boot type
 item install ${ova} install
+item rescue ${ova} rescue
 item
 item firmware_menu Use Non-free Firmware [ ${firmware_enabled} ]
 item
@@ -40,6 +41,7 @@ item --gap cmdline: ${cmdline}
 item --gap initrd_url: ${initrd_url}
 isset ${bt} || choose bt || goto debian
 iseq ${bt} install && goto deb_boot ||
+iseq ${bt} rescue && goto deb_rescue ||
 iseq ${bt} firmware_menu && goto firmware_menu ||
 goto deb_boot
 
@@ -48,6 +50,11 @@ set initrd_url http://${boot_domain}/netboot/debian/${debian_version}/initrd.gz
 set firmware_enabled true
 clear bt
 goto debian
+
+:deb_rescue
+set preseedurl http://${boot_domain}/netboot/preseed/debian-rescue.cfg
+set install_params rescue auto=true priority=critical ${locales} preseed/url=${preseedurl}
+goto deb_boot
 
 :deb_boot
 imgfree
