@@ -22,6 +22,7 @@ goto boottype
 set ova ${os} ${ubuntu_version}
 menu ${os} ${os_arch} boot type
 item install ${ova} install
+item rescue ${ova} rescue
 item
 item --gap Settings:
 item
@@ -29,6 +30,11 @@ item --gap autoinstall: ${autoinstall_url}
 item --gap cmdline: ${cmdline}
 isset ${bt} || choose bt || goto ubuntu
 iseq ${bt} install && goto ubu_boot ||
+iseq ${bt} rescue && goto ubu_rescue ||
+goto ubu_boot
+
+:ubu_rescue
+set autoinstall_url http://${boot_domain}/netboot/autoinstall/ubuntu-rescue/
 goto ubu_boot
 
 :ubu_boot
