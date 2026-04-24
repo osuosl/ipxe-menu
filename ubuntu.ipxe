@@ -39,7 +39,7 @@ goto ubu_boot
 
 :ubu_boot
 imgfree
-kernel http://${boot_domain}/${dir}/vmlinuz initrd=initrd autoinstall ds=nocloud-net;s=${autoinstall_url} ip=dhcp ${cmdline}
+kernel http://${boot_domain}/${dir}/vmlinuz autoinstall ds=nocloud-net;s=${autoinstall_url} ip=dhcp ${cmdline}
 initrd http://${boot_domain}/${dir}/initrd
 echo
 echo MD5sums:
