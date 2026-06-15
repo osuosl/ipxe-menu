@@ -23,7 +23,7 @@ set dir ${debian_base_dir}/dists/${debian_version}/main/installer-${os_arch}/cur
 set preseedurl http://${boot_domain}/netboot/preseed/debian.cfg
 set locales debian-installer=en_US locale=en_US kbd-chooser/method=us console-setup/ask_detect=false
 set install_params install auto=true priority=critical ${locales} preseed/url=${preseedurl}
-iseq ${firmware_enabled} false && set initrd_url ${debian_mirror}/${dir}/initrd.gz ||
+iseq ${firmware_enabled} true && set initrd_url http://${boot_domain}/netboot/debian/${debian_version}/initrd.gz || set initrd_url ${debian_mirror}/${dir}/initrd.gz
 goto boottype
 
 :boottype
@@ -42,27 +42,26 @@ item --gap repo: ${debian_mirror}
 item --gap cmdline: ${cmdline}
 item --gap initrd_url: ${initrd_url}
 isset ${bt} || choose bt || goto debian
-iseq ${bt} install && goto deb_install ||
+iseq ${bt} install && goto deb_boot ||
 iseq ${bt} rescue && goto deb_rescue ||
 iseq ${bt} firmware_menu && goto firmware_menu ||
 iseq ${bt} desktop_menu && goto desktop_menu ||
 goto deb_boot
 
 :firmware_menu
-set initrd_url http://${boot_domain}/netboot/debian/${debian_version}/initrd.gz
-set firmware_enabled true
+iseq ${firmware_enabled} true && set firmware_enabled false || set firmware_enabled true
+iseq ${firmware_enabled} true && set initrd_url http://${boot_domain}/netboot/debian/${debian_version}/initrd.gz ||
+iseq ${firmware_enabled} false && set initrd_url ${debian_mirror}/${dir}/initrd.gz ||
 clear bt
 goto boottype
 
 :desktop_menu
 iseq ${desktop_enabled} true && set desktop_enabled false || set desktop_enabled true
+iseq ${desktop_enabled} true && set preseedurl http://${boot_domain}/netboot/preseed/debian-desktop.cfg ||
+iseq ${desktop_enabled} false && set preseedurl http://${boot_domain}/netboot/preseed/debian.cfg ||
+set install_params install auto=true priority=critical ${locales} preseed/url=${preseedurl}
 clear bt
 goto boottype
-
-:deb_install
-iseq ${desktop_enabled} true && set preseedurl http://${boot_domain}/netboot/preseed/debian-desktop.cfg ||
-set install_params install auto=true priority=critical ${locales} preseed/url=${preseedurl}
-goto deb_boot
 
 :deb_rescue
 set preseedurl http://${boot_domain}/netboot/preseed/debian-rescue.cfg
