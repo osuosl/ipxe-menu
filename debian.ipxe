@@ -23,6 +23,7 @@ set dir ${debian_base_dir}/dists/${debian_version}/main/installer-${os_arch}/cur
 set preseedurl http://${boot_domain}/netboot/preseed/debian.cfg
 set locales debian-installer=en_US locale=en_US kbd-chooser/method=us console-setup/ask_detect=false
 set install_params install auto=true priority=critical ${locales} preseed/url=${preseedurl}
+set deb_cmdline ${cmdline}
 iseq ${firmware_enabled} true && set initrd_url http://${boot_domain}/netboot/debian/${debian_version}/initrd.gz || set initrd_url ${debian_mirror}/${dir}/initrd.gz
 goto boottype
 
@@ -39,7 +40,7 @@ item --gap Settings:
 item
 item --gap preseed: ${preseedurl}
 item --gap repo: ${debian_mirror}
-item --gap cmdline: ${cmdline}
+item --gap cmdline: ${deb_cmdline}
 item --gap initrd_url: ${initrd_url}
 isset ${bt} || choose bt || goto debian
 iseq ${bt} install && goto deb_boot ||
@@ -59,6 +60,8 @@ goto boottype
 iseq ${desktop_enabled} true && set desktop_enabled false || set desktop_enabled true
 iseq ${desktop_enabled} true && set preseedurl http://${boot_domain}/netboot/preseed/debian-desktop.cfg ||
 iseq ${desktop_enabled} false && set preseedurl http://${boot_domain}/netboot/preseed/debian.cfg ||
+iseq ${desktop_enabled} true && clear deb_cmdline ||
+iseq ${desktop_enabled} false && set deb_cmdline ${cmdline} ||
 set install_params install auto=true priority=critical ${locales} preseed/url=${preseedurl}
 clear bt
 goto boottype
@@ -66,11 +69,12 @@ goto boottype
 :deb_rescue
 set preseedurl http://${boot_domain}/netboot/preseed/debian-rescue.cfg
 set install_params rescue/enable=true auto=true priority=critical ${locales} preseed/url=${preseedurl}
+set deb_cmdline ${cmdline}
 goto deb_boot
 
 :deb_boot
 imgfree
-kernel ${debian_mirror}/${dir}/linux ${install_params} interface=auto ${mirrorcfg} initrd=initrd.gz ${cmdline}
+kernel ${debian_mirror}/${dir}/linux ${install_params} interface=auto ${mirrorcfg} initrd=initrd.gz ${deb_cmdline}
 initrd ${initrd_url}
 echo
 echo MD5sums:
